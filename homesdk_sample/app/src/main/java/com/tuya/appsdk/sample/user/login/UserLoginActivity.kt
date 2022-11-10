@@ -28,6 +28,12 @@ import com.tuya.smart.android.user.api.ILoginCallback
 import com.tuya.smart.android.user.bean.User
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 
+//IDP
+import org.forgerock.android.auth.FRListener;
+import org.forgerock.android.auth.FRUser;
+import org.forgerock.android.auth.exception.AuthenticationRequiredException;
+import org.json.JSONObject;
+
 /**
  * User Login Example
  *
@@ -80,7 +86,9 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
                         ).show()
                     }
                 }
+                //ToDO: reemplazar esto por pegada a idp
                 if (ValidatorUtil.isEmail(strAccount)) {
+
                     TuyaHomeSdk.getUserInstance()
                         .loginWithEmail(strCountryCode, strAccount, strPassword, callback)
                 } else {

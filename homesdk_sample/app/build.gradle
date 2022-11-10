@@ -5,10 +5,9 @@ plugins {
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.test007.demo"
+        applicationId "tecosh_v1.r0.p0"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
@@ -19,6 +18,9 @@ android {
         manifestPlaceholders = [
                 TUYA_SMART_APPKEY: "${properties.getProperty("appKey")}",
                 TUYA_SMART_SECRET: "${properties.getProperty("appSecret")}",
+                //used by IDP
+                'appAuthRedirectScheme': 'org.forgerock.demo',
+                crashlyticsCollectionEnabled: "true",
         ]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -68,6 +70,10 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.1.67.android'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.14.9'
 
+    // The latest stable App SDK for Android.
+    implementation 'com.tuya.smart:tuyasmart:4.0.0'
+
+
 
     implementation project(':base_res')
     implementation project(":home")
@@ -75,6 +81,11 @@ dependencies {
     implementation project(":device_management")
     implementation project(":ipc")
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
+
+    //IDP
+    implementation 'org.forgerock:forgerock-auth:3.2.0'
+    implementation 'org.forgerock:forgerock-auth-ui:3.2.0'
+    implementation 'net.openid:appauth:0.7.1'
 
 
 }
