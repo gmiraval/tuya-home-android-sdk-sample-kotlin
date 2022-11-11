@@ -12,8 +12,11 @@
 
 package com.tuya.appsdk.sample.user.login
 
+//IDP
+
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -22,17 +25,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.tuya.appsdk.sample.R
 import com.tuya.appsdk.sample.main.MainSampleListActivity
+import com.tuya.appsdk.sample.user.main.UserFuncActivity
 import com.tuya.appsdk.sample.user.resetPassword.UserResetPasswordActivity
-import com.tuya.smart.android.common.utils.ValidatorUtil
-import com.tuya.smart.android.user.api.ILoginCallback
-import com.tuya.smart.android.user.bean.User
-import com.tuya.smart.home.sdk.TuyaHomeSdk
+import net.openid.appauth.AuthorizationRequest
+import org.forgerock.android.auth.FRAuth
+import org.forgerock.android.auth.FRListener
+import org.forgerock.android.auth.FRUser
+import org.forgerock.android.auth.Logger
+import org.forgerock.android.auth.exception.AuthenticationRequiredException
 
-//IDP
-import org.forgerock.android.auth.FRListener;
-import org.forgerock.android.auth.FRUser;
-import org.forgerock.android.auth.exception.AuthenticationRequiredException;
-import org.json.JSONObject;
 
 /**
  * User Login Example
@@ -42,6 +43,7 @@ import org.json.JSONObject;
  */
 class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.user_activity_login)
 
@@ -52,6 +54,7 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
 
         findViewById<Button>(R.id.btnLogin).setOnClickListener(this)
         findViewById<Button>(R.id.btnForget).setOnClickListener(this)
+
     }
 
     override fun onClick(v: View?) {
@@ -60,7 +63,8 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
         val strPassword = findViewById<EditText>(R.id.etPassword).text.toString()
 
         v?.id?.let {
-            if (it == R.id.btnLogin) {
+            //login original
+            /*if (it == R.id.btnLogin) {
                 // Login with phone
               val callback =  object : ILoginCallback {
                     override fun onSuccess(user: User?) {
@@ -86,7 +90,7 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
                         ).show()
                     }
                 }
-                //ToDO: reemplazar esto por pegada a idp
+
                 if (ValidatorUtil.isEmail(strAccount)) {
 
                     TuyaHomeSdk.getUserInstance()
@@ -95,9 +99,92 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
                     TuyaHomeSdk.getUserInstance()
                         .loginWithPhonePassword(strCountryCode, strAccount, strPassword, callback)
                 }
-            } else if (it == R.id.btnForget) {
+            }*/
+
+            //login IDP
+            if (it == R.id.btnLogin) {
+                FRAuth.start(this)
+                Logger.set(Logger.Level.DEBUG)
+
+                if (FRUser.getCurrentUser() != null) {
+                    try {
+                        navigate()
+                    } catch (e: AuthenticationRequiredException) {
+                        e.printStackTrace()
+                    }
+                } else {
+                    launchBrowser()
+                }
+
+            }
+
+
+            else if (it == R.id.btnForget) {
                 startActivity(Intent(this, UserResetPasswordActivity::class.java))
             }
         }
     }
+
+    //funciones IDP
+    private fun launchBrowser() {
+        Log.d("TAGGG", "inicio launchBrowser")
+        FRUser.browser().appAuthConfigurer()
+            .authorizationRequest { r: AuthorizationRequest.Builder ->
+                val additionalParameters: MutableMap<String, String> =
+                    HashMap()
+                additionalParameters.put("acr_values", "Login2")
+
+                r.setAdditionalParameters(additionalParameters)
+            }.done()
+            .login(this, object : FRListener<FRUser?> {
+                override fun onSuccess(result: FRUser?) {
+                    try {
+                        navigate()
+                    } catch (e: AuthenticationRequiredException) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onException(e: Exception) {
+                    //failed
+                    Log.d("TAGGG", "error login")
+                    finish()
+                }
+            })
+    }
+
+
+    private fun navigate() {
+
+
+        val token = FRUser.getCurrentUser().accessToken.idToken
+
+        Log.d("TAGGG", token)
+
+        //mostramos toast te logueado ok
+        var msg = StringBuilder()
+        msg.append("login exitoso \n")
+        msg.append(token)
+
+        val toast = Toast.makeText(
+            applicationContext,
+            msg,
+            Toast.LENGTH_SHORT
+        )
+        toast.show()
+        val intent = Intent(this, MainSampleListActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
