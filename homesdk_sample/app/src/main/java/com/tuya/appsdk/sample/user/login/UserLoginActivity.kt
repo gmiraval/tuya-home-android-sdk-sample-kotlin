@@ -24,6 +24,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.tuya.appsdk.sample.R
+import com.tuya.appsdk.sample.binding.BindingActivity
 import com.tuya.appsdk.sample.main.MainSampleListActivity
 import com.tuya.appsdk.sample.user.main.UserFuncActivity
 import com.tuya.appsdk.sample.user.resetPassword.UserResetPasswordActivity
@@ -172,7 +173,11 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
             Toast.LENGTH_SHORT
         )
         toast.show()
-        val intent = Intent(this, MainSampleListActivity::class.java)
+        /*original activity after login*/
+        /*val intent = Intent(this, MainSampleListActivity::class.java)*/
+        /*binding activity*/
+        val intent = Intent(this, BindingActivity::class.java)
+        intent.putExtra("token",token) //paso token a la BindingActivity*/
         startActivity(intent)
         finish()
     }

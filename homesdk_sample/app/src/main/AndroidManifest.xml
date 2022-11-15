@@ -2,9 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tuya.appsdk.sample">
-
-<!--    set permission IDP-->
-<!--    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />-->
+    <!-- set permission IDP -->
+    <!-- <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" /> -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -17,51 +16,54 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
-
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
+
             <category android:name="android.intent.category.BROWSABLE" />
+
             <data android:scheme="https" />
         </intent>
         <intent>
             <action android:name="android.intent.action.VIEW" />
+
             <category android:name="android.intent.category.APP_BROWSER" />
+
             <data android:scheme="https" />
         </intent>
     </queries>
 
-
     <application
+        android:name=".BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".BaseApplication"
         android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
         tools:replace="android:allowBackup,android:supportsRtl">
+
+        <activity
+            android:name=".binding.BindingActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="TUYA_SMART_APPKEY"
             android:value="${TUYA_SMART_APPKEY}" />
         <meta-data
             android:name="TUYA_SMART_SECRET"
-            android:value="${TUYA_SMART_SECRET}" />
-
-
-        <!--        Main        -->
+            android:value="${TUYA_SMART_SECRET}" /> <!-- Main -->
         <activity
             android:name=".main.MainSampleListActivity"
             android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <!--        User        -->
+            android:screenOrientation="portrait" /> <!-- User -->
         <activity
             android:name=".user.main.UserFuncActivity"
             android:screenOrientation="portrait">
-        <!--       confiugre it as launching activity-->
+
+            <!-- confiugre it as launching activity -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

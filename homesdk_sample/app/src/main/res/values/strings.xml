@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><resources>
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
   <string name="app_name">Tuya SDK Kotlin</string>
 
   <string name="user_guide_title">Tuya SDK Sample</string>
