@@ -70,12 +70,14 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation 'com.alibaba:fastjson:1.1.67.android'
-    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.14.9'
 
     // The latest stable App SDK for Android.
-    implementation 'com.tuya.smart:tuyasmart:4.0.0'
+    //App SDK v4.0 and later are classified into Trial and Official editions.
+    //The Official edition can be used only after you pay for an annual subscription.
+    // For more information, see Pricing.
 
-
+    //implementation 'com.tuya.smart:tuyasmart:4.0.2'
+    implementation 'com.tuya.smart:tuyasmart:3.10.0'
 
     implementation project(':base_res')
     implementation project(":home")
@@ -92,6 +94,7 @@ dependencies {
     //http lib - okhttp
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.10.0'
 
     //json parsers
     implementation ("org.json:json:20220924")

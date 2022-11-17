@@ -9,11 +9,16 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.progressindicator.CircularProgressIndicator
+import androidx.appcompat.widget.Toolbar
+
+
 import com.tuya.appsdk.sample.R
 import com.tuya.appsdk.sample.resource.HomeModel
+import com.tuya.smart.android.user.api.ILoginCallback
+import com.tuya.smart.android.user.bean.User
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.builder.ActivatorBuilder
+import com.tuya.smart.sdk.api.ITuyaActivator
 import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
 import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
 import com.tuya.smart.sdk.bean.DeviceBean
@@ -40,7 +45,7 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
         const val TAG = "DeviceConfigEZ"
     }
 
-    lateinit var cpiLoading: CircularProgressIndicator
+    /*lateinit var cpiLoading: CircularProgressIndicator*/
     lateinit var buttonAP: Button
 
     lateinit var bindToken: String
@@ -49,13 +54,14 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_binding)
 
+
         //config listener de botones
         buttonAP = findViewById(R.id.buttonAP)
         buttonAP.setOnClickListener(this)
 
 
         val token: String = intent.getStringExtra("token").toString()
-        Log.d("TAGGG binding", token)
+        Log.d("TAGGG", "binding token:$token")
 
         //get binding token
         ///https://square.github.io/okhttp/recipes/
@@ -89,14 +95,14 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                 val res = JSONObject(response.body!!.string()).getJSONObject("result")
                 bindToken = res.getString("token")
 
-                Log.d("TAGGG binding token", bindToken )
+                Log.d("TAGGG", "binding token:$bindToken")
                 val tvb: TextView = findViewById<TextView>(R.id.textViewBinding)
 
                 //cambio valor textview a token
-                tvb.text = "Binding Token:" + bindToken
+                tvb.text = bindToken
 
                 //log binding token response
-                Log.d("TAGGG binding response", res.toString())
+                Log.d("TAGGG", "binding response:"+res.toString())
 
             }
         })
@@ -118,80 +124,87 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                 //ToDO: implement ap mode binding
                 //imprimir token en layout y boton para enviar biding token luego de pasar a wifi del modo AP
 
-                Log.d("TAGGG binding token",bindToken)
+
+                Log.d("TAGGG", "binding token:$bindToken")
+
+                //prueba: login a manopla antes a ver si lo necesita
+                val callback =  object : ILoginCallback {
+                    override fun onSuccess(user: User?) {
+                        Toast.makeText(
+                            this@BindingActivity,
+                            "Login success",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        Log.d("TAGGG", "login hardcoded ok")
+                    }
+
+                    override fun onError(code: String?, error: String?) {
+                        TODO("Not yet implemented")
+                        Log.d("TAGGG", "login erroneo")
+                    }
+                }
+                TuyaHomeSdk.getUserInstance().loginWithUid("54","az1667917723613cr4Tk","12345678",callback)
 
 
-                //rutina original que sacaba acá el binding token.
-                //pedia home poruqe por sdk es asi.
-                //cuando creamos cuenta por openapi crea un home default
-/*                val homeId = HomeModel.INSTANCE.getCurrentHome(this)
-                // Get Network Configuration Token
-                TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
-                    object : ITuyaActivatorGetToken {
-                        override fun onSuccess(token: String) {
+                // Start network configuration -- AP mode
+                val builder = ActivatorBuilder()
+                    .setSsid(strSsid)
+                    .setContext(v.context)
+                    .setPassword(strPassword)
+                    .setActivatorModel(ActivatorModelEnum.TY_AP)
+                    .setTimeOut(100)
+                    .setToken(bindToken)
+                    .setListener(object : ITuyaSmartActivatorListener {
 
-                            // Start network configuration -- AP mode
-                            val builder = ActivatorBuilder()
-                                .setSsid(strSsid)
-                                .setContext(v.context)
-                                .setPassword(strPassword)
-                                .setActivatorModel(ActivatorModelEnum.TY_AP)
-                                .setTimeOut(100)
-                                .setToken(token)
-                                .setListener(object : ITuyaSmartActivatorListener {
-
-                                    @Override
-                                    override fun onStep(step: String?, data: Any?) {
-                                        Log.i(TAG, "$step --> $data")
-                                    }
-
-                                    override fun onActiveSuccess(devResp: DeviceBean?) {
-                                        cpiLoading.visibility = View.GONE
-
-                                        Log.i(TAG, "Activate success")
-                                        Toast.makeText(
-                                            this@BindingActivity,
-                                            "Activate success",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-
-                                        finish()
-                                    }
-
-                                    override fun onError(
-                                        errorCode: String?,
-                                        errorMsg: String?
-                                    ) {
-                                        cpiLoading.visibility = View.GONE
-                                        btnSearch.isClickable = true
-
-                                        Toast.makeText(
-                                            this@BindingActivity,
-                                            "Activate error-->$errorMsg",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                                }
-                                )
-
-                            val mTuyaActivator =
-                                TuyaHomeSdk.getActivatorInstance().newActivator(builder)
-
-                            //Start configuration
-                            mTuyaActivator.start()
-
-                            //Show loading progress, disable btnSearch clickable
-                            cpiLoading.visibility = View.VISIBLE
-                            btnSearch.isClickable = false
-
-                            //Stop configuration
-//                                mTuyaActivator.stop()
-                            //Exit the page to destroy some cache data and monitoring data.
-//                                mTuyaActivator.onDestroy()
+                        @Override
+                        override fun onStep(step: String?, data: Any?) {
+                            Log.i(TAG, "$step --> $data")
                         }
 
-                        override fun onFailure(s: String, s1: String) {}
-                    })*/
+                        override fun onActiveSuccess(devResp: DeviceBean?) {
+                            /*cpiLoading.visibility = View.GONE*/
+
+                            Log.i(TAG, "Activate success")
+                            Toast.makeText(
+                                this@BindingActivity,
+                                "Activate success",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            finish()
+                        }
+
+                        override fun onError(
+                            errorCode: String?,
+                            errorMsg: String?
+                        ) {
+/*
+                            cpiLoading.visibility = View.GONE
+*/
+                            //buttonAP.isClickable = true
+
+                            Toast.makeText(
+                                this@BindingActivity,
+                                "Activate error-->$errorMsg",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                    )
+
+                //val mTuyaActivator: ITuyaActivator = TuyaHomeSdk.getActivatorInstance().newActivator(builder)
+
+                //Start pairing
+                //mTuyaActivator.start()
+
+                //Show loading progress, disable btnSearch clickable
+                //cpiLoading.visibility = View.VISIBLE
+                //buttonAP.isClickable = false
+
+                //Stop configuration
+//                                mTuyaActivator.stop()
+                //Exit the page to destroy some cache data and monitoring data.
+//                                mTuyaActivator.onDestroy()
+
             }
         }
     }

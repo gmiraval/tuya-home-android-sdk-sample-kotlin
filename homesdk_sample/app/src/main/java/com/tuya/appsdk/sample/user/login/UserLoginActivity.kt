@@ -28,6 +28,10 @@ import com.tuya.appsdk.sample.binding.BindingActivity
 import com.tuya.appsdk.sample.main.MainSampleListActivity
 import com.tuya.appsdk.sample.user.main.UserFuncActivity
 import com.tuya.appsdk.sample.user.resetPassword.UserResetPasswordActivity
+import com.tuya.smart.android.common.utils.ValidatorUtil
+import com.tuya.smart.android.user.api.ILoginCallback
+import com.tuya.smart.android.user.bean.User
+import com.tuya.smart.home.sdk.TuyaHomeSdk
 import net.openid.appauth.AuthorizationRequest
 import org.forgerock.android.auth.FRAuth
 import org.forgerock.android.auth.FRListener
@@ -65,10 +69,10 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
 
         v?.id?.let {
             //login original
-            /*if (it == R.id.btnLogin) {
+            if (it == R.id.btnLogin) {
                 // Login with phone
               val callback =  object : ILoginCallback {
-                    override fun onSuccess(user: User?) {
+                    override fun onSuccess(user: 54User?) {
                         Toast.makeText(
                             this@UserLoginActivity,
                             "Login success",
@@ -92,17 +96,21 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
 
-                if (ValidatorUtil.isEmail(strAccount)) {
+                //comentamos login con mail o linea
+/*                if (ValidatorUtil.isEmail(strAccount)) {
 
                     TuyaHomeSdk.getUserInstance()
                         .loginWithEmail(strCountryCode, strAccount, strPassword, callback)
                 } else {
                     TuyaHomeSdk.getUserInstance()
                         .loginWithPhonePassword(strCountryCode, strAccount, strPassword, callback)
-                }
-            }*/
+                }*/
+                //login con uid
+                TuyaHomeSdk.getUserInstance().loginWithUid(strCountryCode, strAccount, strPassword, callback)
+            }
 
-            //login IDP
+
+/*            //login IDP
             if (it == R.id.btnLogin) {
                 FRAuth.start(this)
                 Logger.set(Logger.Level.DEBUG)
@@ -117,7 +125,7 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
                     launchBrowser()
                 }
 
-            }
+            }*/
 
 
             else if (it == R.id.btnForget) {
