@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+
 }
 
 android {
@@ -94,6 +95,12 @@ dependencies {
     /// define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+
+    //json parsers
+    implementation ("org.json:json:20220924")
+
+
+
 
 
 
