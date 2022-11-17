@@ -90,11 +90,8 @@ dependencies {
     implementation 'net.openid:appauth:0.7.1'
 
     //http lib - okhttp
-    /// define a BOM and its version
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
-    /// define any required OkHttp artifacts without version
-    implementation("com.squareup.okhttp3:okhttp")
-    implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
     //json parsers
     implementation ("org.json:json:20220924")
