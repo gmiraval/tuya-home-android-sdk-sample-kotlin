@@ -56,9 +56,16 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var mContentTv: TextView
 
 
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_config_activity)
+
+        //me traigo token de activity anterior y ya lo guardo aca en vez debuscarlo mas abajo
+        mToken = intent.getStringExtra("token").toString()
+
 
         val toolbar: Toolbar = findViewById<View>(R.id.topAppBar) as Toolbar
         toolbar.setNavigationOnClickListener {
@@ -79,8 +86,12 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
 
         v?.id?.let {
             if (it == R.id.btnSearch) {
-                val homeId = HomeModel.INSTANCE.getCurrentHome(this)
-                // Get Network Configuration Token
+
+                //todo: ver porque no pasa
+                Log.d("TAGGG", "binding recibido de BFF:$mToken")
+                onClickSetting()
+/*                // Get Network Configuration Token -original
+                //val homeId = HomeModel.INSTANCE.getCurrentHome(this)
                 TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
                         object : ITuyaActivatorGetToken {
                             override fun onSuccess(token: String) {
@@ -97,7 +108,12 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                             override fun onFailure(s: String, s1: String) {
 
                             }
-                        })
+                        })*/
+
+
+
+
+
             }
         }
     }
