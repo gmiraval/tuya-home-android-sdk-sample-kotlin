@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.tuya.appsdk.sample.R
 import com.tuya.appsdk.sample.resource.HomeModel
+import com.tuya.smart.android.user.api.ILoginCallback
+import com.tuya.smart.android.user.bean.User
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.builder.ActivatorBuilder
 import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
@@ -93,10 +95,29 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                 val tvb: TextView = findViewById<TextView>(R.id.textViewBinding)
 
                 //cambio valor textview a token
-                tvb.text = "Binding Token:" + bindToken
+                tvb.text = "Binding Token:$bindToken"
 
                 //log binding token response
                 Log.d("TAGGG binding response", res.toString())
+
+                //login hardcoded para probar  por si lo necesita para el bindind
+                val uid = "0000O125"
+                val pwd = "12345678"
+                val callback =  object : ILoginCallback {
+                    override fun onSuccess(user: User?) {
+                        Toast.makeText(
+                            this@BindingActivity,
+                            "Login success",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                    }
+
+                    override fun onError(code: String?, error: String?) {
+                        TODO("Not yet implemented")
+                    }
+                }
+                TuyaHomeSdk.getUserInstance().loginWithUid("54", uid, pwd, callback)
 
             }
         })
@@ -121,10 +142,13 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                 Log.d("TAGGG binding token",bindToken)
 
 
+
+
+
                 //rutina original que sacaba acá el binding token.
                 //pedia home poruqe por sdk es asi.
                 //cuando creamos cuenta por openapi crea un home default
-/*                val homeId = HomeModel.INSTANCE.getCurrentHome(this)
+                val homeId = HomeModel.INSTANCE.getCurrentHome(this)
                 // Get Network Configuration Token
                 TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
                     object : ITuyaActivatorGetToken {
@@ -137,7 +161,7 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                                 .setPassword(strPassword)
                                 .setActivatorModel(ActivatorModelEnum.TY_AP)
                                 .setTimeOut(100)
-                                .setToken(token)
+                                .setToken(bindToken)
                                 .setListener(object : ITuyaSmartActivatorListener {
 
                                     @Override
@@ -146,7 +170,7 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                                     }
 
                                     override fun onActiveSuccess(devResp: DeviceBean?) {
-                                        cpiLoading.visibility = View.GONE
+                                        //cpiLoading.visibility = View.GONE
 
                                         Log.i(TAG, "Activate success")
                                         Toast.makeText(
@@ -162,8 +186,8 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                                         errorCode: String?,
                                         errorMsg: String?
                                     ) {
-                                        cpiLoading.visibility = View.GONE
-                                        btnSearch.isClickable = true
+                                        //cpiLoading.visibility = View.GONE
+                                        buttonAP.isClickable = true
 
                                         Toast.makeText(
                                             this@BindingActivity,
@@ -181,8 +205,8 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                             mTuyaActivator.start()
 
                             //Show loading progress, disable btnSearch clickable
-                            cpiLoading.visibility = View.VISIBLE
-                            btnSearch.isClickable = false
+                            //cpiLoading.visibility = View.VISIBLE
+                            buttonAP.isClickable = false
 
                             //Stop configuration
 //                                mTuyaActivator.stop()
@@ -191,7 +215,7 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
                         }
 
                         override fun onFailure(s: String, s1: String) {}
-                    })*/
+                    })
             }
         }
     }
