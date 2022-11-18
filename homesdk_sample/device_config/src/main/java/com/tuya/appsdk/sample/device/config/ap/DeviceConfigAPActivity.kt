@@ -12,6 +12,7 @@
 
 package com.tuya.appsdk.sample.device.config.ap
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
@@ -33,6 +34,18 @@ import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
 import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
 import com.tuya.smart.sdk.bean.DeviceBean
 import com.tuya.smart.sdk.enums.ActivatorModelEnum
+import okhttp3.*
+import org.json.JSONObject
+import java.io.IOException
+
+//okhttp libs
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+
 
 
 /**
@@ -50,22 +63,18 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var cpiLoading: CircularProgressIndicator
     lateinit var btnSearch: Button
     lateinit var mToken: String
+    lateinit var token: String
     private var mTuyaActivator: ITuyaActivator? = null
     lateinit var strSsid: String
     lateinit var strPassword: String
     lateinit var mContentTv: TextView
 
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_config_activity)
 
-        //me traigo token de activity anterior y ya lo guardo aca en vez debuscarlo mas abajo
-        mToken = intent.getStringExtra("token").toString()
-
+        //me traigo idtoken de activity anterior
+        token = intent.getStringExtra("token").toString()
 
         val toolbar: Toolbar = findViewById<View>(R.id.topAppBar) as Toolbar
         toolbar.setNavigationOnClickListener {
@@ -78,6 +87,64 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
         cpiLoading = findViewById(R.id.cpiLoading)
         btnSearch = findViewById(R.id.btnSearch)
         btnSearch.setOnClickListener(this)
+
+        Log.d("TAGGG", "idtoken recibido de BFF:$token")
+
+        //vamos a buscar binding token con it token a BFF
+        //todo:fix-ver porque no progresa el ap mode-puede ser formato token.
+        //ver en branch master formato del mToken
+        //okhttp -http client
+        val client = OkHttpClient()
+        val url = "https://tuyabff.apps.k8s.cablevision-labs.com.ar/tuya/device/paring/token"
+        val payload = " "
+        val requestBody = payload.toRequestBody()
+        val request = Request.Builder()
+            .header("User-Agent", "OkHttp Headers.java")
+            .addHeader("Authorization", "Bearer $token")
+            .addHeader("Accept", "application/json; q=0.5")
+            .method("POST", requestBody)
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle this
+                Log.d("TAGGG", "error call a BFF")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                // Handle this
+                //ojo, response solo puede llamarse una vez, sino da error
+                //guardar en res y luego usar res.
+                val res = JSONObject(response.body!!.string()).getJSONObject("result")
+                mToken = res.getString("token")
+
+                Log.d("TAGGG", "binding token mToken: $mToken")
+
+                //log binding token response
+                Log.d("TAGGG", res.toString())
+
+/*                //login hardcoded para probar  por si lo necesita para el bindind
+                val uid = "0000O125"
+                val pwd = "12345678"
+                val callback =  object : ILoginCallback {
+                    override fun onSuccess(user: User?) {
+                        Toast.makeText(
+                            this@BindingActivity,
+                            "Login success",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                    }
+
+                    override fun onError(code: String?, error: String?) {
+                        TODO("Not yet implemented")
+                    }
+                }
+                TuyaHomeSdk.getUserInstance().loginWithUid("54", uid, pwd, callback)*/
+
+            }
+        })
     }
 
     override fun onClick(v: View?) {
@@ -86,9 +153,6 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
 
         v?.id?.let {
             if (it == R.id.btnSearch) {
-
-                //todo: ver porque no pasa
-                Log.d("TAGGG", "binding recibido de BFF:$mToken")
                 onClickSetting()
 /*                // Get Network Configuration Token -original
                 //val homeId = HomeModel.INSTANCE.getCurrentHome(this)
@@ -170,10 +234,11 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 )
-        mTuyaActivator =
-            TuyaHomeSdk.getActivatorInstance().newActivator(builder)
+        mTuyaActivator = TuyaHomeSdk.getActivatorInstance().newActivator(builder)
         //Start configuration
+        Log.i(TAG, "Activator started")
         mTuyaActivator?.start()
+
 
 
     }

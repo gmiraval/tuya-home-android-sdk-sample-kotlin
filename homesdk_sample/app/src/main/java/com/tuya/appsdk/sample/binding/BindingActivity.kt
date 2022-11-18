@@ -121,11 +121,6 @@ class BindingActivity : AppCompatActivity(), View.OnClickListener  {
 
             }
         })
-
-
-
-
-
     }
 
     override fun onClick(v: View?) {
