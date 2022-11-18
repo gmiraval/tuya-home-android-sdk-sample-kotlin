@@ -27,6 +27,8 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.tuya.appsdk.sample.device.config.R
 import com.tuya.appsdk.sample.resource.HomeModel
+import com.tuya.smart.android.user.api.ILoginCallback
+import com.tuya.smart.android.user.bean.User
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.builder.ActivatorBuilder
 import com.tuya.smart.sdk.api.ITuyaActivator
@@ -117,31 +119,32 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                 //ojo, response solo puede llamarse una vez, sino da error
                 //guardar en res y luego usar res.
                 val res = JSONObject(response.body!!.string()).getJSONObject("result")
-                mToken = res.getString("token")
+                mToken = res.getString("region")+res.getString("secret")+res.getString("token")
 
+                Log.d("TAGGG", "binding token mToken: $res")
                 Log.d("TAGGG", "binding token mToken: $mToken")
 
                 //log binding token response
                 Log.d("TAGGG", res.toString())
 
-/*                //login hardcoded para probar  por si lo necesita para el bindind
+                //login hardcoded para probar  por si lo necesita para el bindind - inicio
                 val uid = "0000O125"
                 val pwd = "12345678"
                 val callback =  object : ILoginCallback {
                     override fun onSuccess(user: User?) {
                         Toast.makeText(
-                            this@BindingActivity,
+                            this@DeviceConfigAPActivity,
                             "Login success",
                             Toast.LENGTH_LONG
                         ).show()
-
+                        Log.d("TAGGG","Login success" )
                     }
-
                     override fun onError(code: String?, error: String?) {
-                        TODO("Not yet implemented")
+                        Log.d("TAGGG","Login failed" )
                     }
                 }
-                TuyaHomeSdk.getUserInstance().loginWithUid("54", uid, pwd, callback)*/
+                TuyaHomeSdk.getUserInstance().loginWithUid("54", uid, pwd, callback)
+                //login hardcoded para probar  por si lo necesita para el bindind -fin
 
             }
         })
@@ -153,9 +156,14 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
 
         v?.id?.let {
             if (it == R.id.btnSearch) {
-                onClickSetting()
-/*                // Get Network Configuration Token -original
-                //val homeId = HomeModel.INSTANCE.getCurrentHome(this)
+
+
+                // Get Network Configuration Token -original
+                //https://support.tuya.com/en/help/_detail/K9g77yqai8my9
+
+                val homeId = HomeModel.INSTANCE.getCurrentHome(this)
+
+                Log.d("TAGGG", "homeId: $homeId")
                 TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId,
                         object : ITuyaActivatorGetToken {
                             override fun onSuccess(token: String) {
@@ -172,7 +180,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                             override fun onFailure(s: String, s1: String) {
 
                             }
-                        })*/
+                        })
 
 
 
@@ -188,7 +196,12 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onRestart() {
         super.onRestart()
+        //print vars
+        Log.d("TAGGG", "strSsid:$strSsid")
+        Log.d("TAGGG", "strPassword:$strPassword")
+        Log.d("TAGGG", "mToken:$mToken")
         //Show loading progress, disable btnSearch clickable
+
         cpiLoading.visibility = View.VISIBLE
         btnSearch.isClickable = false
         cpiLoading.isIndeterminate = true
