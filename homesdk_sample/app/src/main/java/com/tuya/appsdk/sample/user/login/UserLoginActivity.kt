@@ -72,7 +72,7 @@ class UserLoginActivity : AppCompatActivity(), View.OnClickListener {
             if (it == R.id.btnLogin) {
                 // Login with phone
               val callback =  object : ILoginCallback {
-                    override fun onSuccess(user: 54User?) {
+                    override fun onSuccess(user: User?) {
                         Toast.makeText(
                             this@UserLoginActivity,
                             "Login success",

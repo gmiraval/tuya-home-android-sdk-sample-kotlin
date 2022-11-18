@@ -108,6 +108,9 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onRestart() {
         super.onRestart()
+        //imprimo mToken para ver como es
+        Log.d("TAGGG", "mToken:$mToken")
+        //parece ser region+secret+token
         //Show loading progress, disable btnSearch clickable
         cpiLoading.visibility = View.VISIBLE
         btnSearch.isClickable = false
@@ -119,6 +122,7 @@ class DeviceConfigAPActivity : AppCompatActivity(), View.OnClickListener {
                 .setActivatorModel(ActivatorModelEnum.TY_AP)
                 .setTimeOut(100)
                 .setToken(mToken)
+
                 .setListener(object : ITuyaSmartActivatorListener {
 
                     @Override
